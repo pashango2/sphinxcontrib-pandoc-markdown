@@ -5,8 +5,6 @@ import os
 import re
 from tempfile import mkstemp
 from six import PY2
-from docutils import nodes
-from docutils import parsers
 from docutils.parsers.rst import Parser
 
 
@@ -24,6 +22,7 @@ REPLACE_CODE_TYPES = {
 }
 
 
+# noinspection PyUnresolvedReferences
 def post_process(docs):
     new_docs = []
     code_re = re.compile(r".. code::\s+?(.*)")
@@ -72,44 +71,50 @@ class MarkdownParser(Parser):
         "-t", "rst+raw_html-implicit_figures"
     ]
 
-    def parse(self, inputstring, document):
-        outputstring = None
-
+    # noinspection PyUnresolvedReferences
+    def parse(self, input_string, document):
         pre_code = []
-        input_string = []
-        for line in inputstring.splitlines():
+        _input_string = []
+        for line in input_string.splitlines():
             if line.startswith(".. |"):
                 pre_code.append(line)
             else:
-                input_string.append(line)
+                _input_string.append(line)
 
-        input_string = "\n".join(input_string)
-
+        input_string = "\n".join(_input_string)
+        input_dir = None
+        output_dir = None
         try:
-            input = mkstemp()
-            output = mkstemp()
-            os.close(input[0])
-            os.close(output[0])
+            input_dir = mkstemp()
+            output_dir = mkstemp()
+            os.close(input_dir[0])
+            os.close(output_dir[0])
 
-            with open(input[1], 'wt') as f:
+            with open(input_dir[1], 'wt') as f:
                 if PY2:
                     f.write(input_string.encode('utf-8'))
                 else:
                     f.write(input_string)
 
-            cmdline = "pandoc %s -R -r markdown -w rst %s -o %s" % (" ".join(self.PANDOC_OPT), input[1], output[1])
+            cmdline = "pandoc {} -r markdown -w rst {} -o {}".format(
+                " ".join(self.PANDOC_OPT),
+                input_dir[1], output_dir[1]
+            )
             os.system(cmdline)
 
             if PY2:
-                outputstring = open(output[1]).read().decode('utf-8')
+                output_string = open(output_dir[1]).read().decode('utf-8')
             else:
-                outputstring = open(output[1]).read()
+                output_string = open(output_dir[1]).read()
 
-            outputstring = post_process(outputstring)
+            output_string = post_process(output_string)
 
         finally:
-            os.unlink(input[1])
-            os.unlink(output[1])
+            if input_dir:
+                os.unlink(input_dir[1])
+            if output_dir:
+                os.unlink(output_dir[1])
 
-        if outputstring:
-            super(MarkdownParser, self).parse(outputstring, document)
+        if output_string:
+            output_string = "\n".join(pre_code) + output_string
+            super(MarkdownParser, self).parse(output_string, document)
