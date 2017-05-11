@@ -5,7 +5,7 @@ import os
 import re
 from tempfile import mkstemp
 from six import PY2
-from sphinx.parsers import Parser
+from docutils.parsers.rst import Parser
 
 REPLACE_CODE_TYPES = {
     "math": "math",
