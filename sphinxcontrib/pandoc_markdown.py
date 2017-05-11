@@ -37,7 +37,6 @@ class MarkdownProcessor(object):
                 source[0] = open(output[1]).read()
 
             source[0] = post_process(source[0])
-            print(source[0])
 
         finally:
             os.unlink(input[1])
@@ -54,9 +53,18 @@ def setup(app):
     md.setup(app)
 
 
-REPLACE_CODE_TYPES = [
-    "math", "note", "todo", "mermaid"
-]
+REPLACE_CODE_TYPES = {
+    "math": "math",
+    "note": "note",
+    "warning": "warning",
+    "todo": "todo",
+
+    "mermaid": "mermaid",
+    "puml": "",
+    "viz": "graphviz",
+    "graph": "graph",
+    "digraph": "digraph",
+}
 
 
 def post_process(docs):
@@ -64,13 +72,14 @@ def post_process(docs):
     code_re = re.compile(r".. code::\s+?(.*)")
 
     g = (x for x in docs.splitlines())
+
     for doc in g:
         group = code_re.match(doc)
         if group:
             code_type = group.group(1).strip()
 
             if code_type in REPLACE_CODE_TYPES:
-                doc = ".. {}::".format(code_type)
+                doc = ".. {}::".format(REPLACE_CODE_TYPES[code_type])
             elif code_type == "eval_rst":
                 try:
                     doc = g.next() if PY2 else g.__next__()
