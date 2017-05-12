@@ -83,6 +83,10 @@ And write the following in sphinx's `conf.py`.
 
 ```
 extensions += ['sphinx.ext.todo']
+
+...
+
+todo_include_todos=True
 ```
 
 ### mermaid
