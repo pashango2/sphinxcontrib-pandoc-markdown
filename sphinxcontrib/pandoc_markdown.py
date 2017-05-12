@@ -5,7 +5,7 @@ import os
 import re
 from tempfile import mkstemp
 from six import PY2
-from sphinx.parsers import Parser
+from docutils.parsers.rst import Parser
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -115,4 +115,5 @@ class MarkdownParser(Parser):
                 os.unlink(output_dir[1])
 
         if output_string:
-            super(MarkdownParser, self).parse(output_string, document)
+            Parser.parse(self, output_string, document)
+

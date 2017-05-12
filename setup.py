@@ -2,19 +2,19 @@
 
 from setuptools import setup, find_packages
 
-long_desc = open('README.md').read()
+# long_desc = open('README.md').read()
 
 requires = ['Sphinx>=0.6', 'Markdown']
 
 setup(
     name='sphinxcontrib-pandoc-markdown',
-    version='0.1.0',
+    version='0.1.3',
     url='https://github.com/pashango2/sphinxcontrib-pandoc-markdown/',
     license='BSD',
     author='Toshiyuki Ishii',
     author_email='pashango2@gmail.com',
     description='Yet another markdown processor for Sphinx',
-    long_description=long_desc,
+    long_description="",
     zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -28,6 +28,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Documentation',
         'Topic :: Documentation :: Sphinx',
         'Topic :: Utilities',
