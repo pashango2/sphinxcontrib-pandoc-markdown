@@ -59,7 +59,7 @@ Code block.
 
 And write the following in sphinx's `conf.py`.
 
-```
+```python
 extensions += ['sphinx.ext.mathjax']
 ```
 
@@ -81,7 +81,7 @@ This is todo.
 
 And write the following in sphinx's `conf.py`.
 
-```
+```python
 extensions += ['sphinx.ext.todo']
 
 ...
