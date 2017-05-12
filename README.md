@@ -57,6 +57,12 @@ Code block.
 ```
 ````
 
+And write the following in sphinx's `conf.py`.
+
+```
+extensions += ['sphinx.ext.mathjax']
+```
+
 ### note, warning, todo
 
 ````
@@ -73,6 +79,12 @@ This is todo.
 ```
 ````
 
+And write the following in sphinx's `conf.py`.
+
+```
+extensions += ['sphinx.ext.todo']
+```
+
 ### mermaid
 
 ````
@@ -85,3 +97,4 @@ graph TD;
 ```
 ````
 
+Requirement [sphinxcontrib-mermaid](https://github.com/mgaitan/sphinxcontrib-mermaid).
