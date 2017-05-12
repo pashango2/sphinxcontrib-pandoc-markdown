@@ -18,6 +18,8 @@ REPLACE_CODE_TYPES = {
     "graph": "graph",
     "digraph": "digraph",
     "wavedrom": "wavedrom",
+    "puml": "uml",
+    "plantuml": "uml",
 }
 
 
