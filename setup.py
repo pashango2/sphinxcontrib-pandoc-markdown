@@ -8,7 +8,7 @@ requires = ['Sphinx>=0.6', 'Markdown']
 
 setup(
     name='sphinxcontrib-pandoc-markdown',
-    version='0.1.4',
+    version='0.1.5',
     url='https://github.com/pashango2/sphinxcontrib-pandoc-markdown/',
     license='BSD',
     author='Toshiyuki Ishii',

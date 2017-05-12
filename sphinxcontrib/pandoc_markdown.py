@@ -17,13 +17,14 @@ REPLACE_CODE_TYPES = {
     "viz": "graphviz",
     "graph": "graph",
     "digraph": "digraph",
+    "wavedrom": "wavedrom",
 }
 
 
 # noinspection PyUnresolvedReferences
 def post_process(docs):
     new_docs = []
-    code_re = re.compile(r".. code::\s+?(.*)")
+    code_re = re.compile(r".. code::\s+?@?(.*)")
 
     g = (x for x in docs.splitlines())
 
