@@ -14,7 +14,6 @@ REPLACE_CODE_TYPES = {
     "todo": "todo",
 
     "mermaid": "mermaid",
-    "puml": "",
     "viz": "graphviz",
     "graph": "graph",
     "digraph": "digraph",
@@ -115,4 +114,5 @@ class MarkdownParser(Parser):
                 os.unlink(output_dir[1])
 
         if output_string:
-            super(MarkdownParser, self).parse(output_string, document)
+            Parser.parse(self, output_string, document)
+
