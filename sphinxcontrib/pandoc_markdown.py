@@ -14,7 +14,6 @@ REPLACE_CODE_TYPES = {
     "todo": "todo",
 
     "mermaid": "mermaid",
-    "puml": "",
     "viz": "graphviz",
     "graph": "graph",
     "digraph": "digraph",
