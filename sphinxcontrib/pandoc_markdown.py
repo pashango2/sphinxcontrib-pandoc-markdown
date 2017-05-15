@@ -12,21 +12,23 @@ REPLACE_CODE_TYPES = {
     "note": "note",
     "warning": "warning",
     "todo": "todo",
+    "todolist": "todolist",
+    "seealso": "seealso",
+    "pull-quote": "pull-quote",
+    "highlights": "highlights",
+    "epigraph": "epigraph",
 
     "mermaid": "mermaid",
     "viz": "graphviz",
     "graph": "graph",
     "digraph": "digraph",
-    "wavedrom": "wavedrom",
-    "puml": "uml",
-    "plantuml": "uml",
 }
 
 
 # noinspection PyUnresolvedReferences
 def post_process(docs):
     new_docs = []
-    code_re = re.compile(r".. code::\s+?@?(.*)")
+    code_re = re.compile(r".. code::\s+?(.*)")
 
     g = (x for x in docs.splitlines())
 
@@ -118,4 +120,3 @@ class MarkdownParser(Parser):
 
         if output_string:
             Parser.parse(self, output_string, document)
-
