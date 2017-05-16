@@ -142,24 +142,25 @@ def test_list():
 
 
 def test_bullet_list():
+    # Note: https://github.com/jgm/pandoc/issues/137
     markdown = """
 - A
-  - A-1
-  - A-2
+    - A-1
+    - A-2
 - B
-  - B-1
-  - B-2
+    - B-1
+    - B-2
     """.strip()
 
     ans = """
-- A
+-  A
 
-  - A-1
-  - A-2
-- B
+   -  A-1
+   -  A-2
 
-  - B-1
-  - B-2
+-  B
+
+   -  B-1
+   -  B-2
     """.strip()
-
     assert MarkdownParser.convert(markdown).strip() == ans
