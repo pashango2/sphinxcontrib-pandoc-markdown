@@ -5,7 +5,10 @@ import os
 import re
 from tempfile import mkstemp
 from six import PY2
+import codecs
 from docutils.parsers.rst import Parser
+
+__version__ = "1.6"
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -23,6 +26,140 @@ REPLACE_CODE_TYPES = {
     "graph": "graph",
     "digraph": "digraph",
 }
+
+
+EXTENSION_DIRECTIVE_DICT = {
+    '.mermaid': 'mermaid',
+    '.plantuml': 'uml',
+    '.puml': 'uml',
+    '.wavedrom': 'wavedrom',
+    '.viz': 'graphviz',
+    '.dot': 'graphviz',
+}
+
+
+EXTENSION_LANGUAGE_DICT = {
+    '.sh': 'shell',
+    '.bash': 'shell',
+    '.c': 'c',
+    '.cpp': 'cpp',
+    '.coffee': 'coffee',
+    '.coffeescript': 'coffee',
+    '.coffee-script': 'coffee',
+    '.cs': 'cs',
+    '.csharp': 'cs',
+    '.css': 'css',
+    '.scss': 'css.scss',
+    '.sass': 'sass',
+    '.erlang': 'erl',
+    '.go': 'go',
+    '.html': 'text.html.basic',
+    '.java': 'java',
+    '.js': 'js',
+    '.javascript': 'js',
+    '.json': 'json',
+    '.less': 'less',
+    '.mustache': 'text.html.mustache',
+    '.objc': 'objc',
+    '.objectivec': 'objc',
+    '.objective-c': 'objc',
+    '.php': 'text.html.php',
+    '.py': 'python',
+    '.pyw': 'python',
+    '.python': 'python',
+    '.rb': 'ruby',
+    '.ruby': 'ruby',
+    '.text': 'text.plain',
+    '.toml': 'toml',
+    '.xml': 'xml',
+    '.yaml': 'yaml',
+    '.yml': 'yaml',
+    '.yaml_table': 'yaml',
+    '.erd': 'erd',
+    '.node': 'js',
+    '.markdown': 'markdown',
+    '.md': "markdown"
+}
+
+IMPORT_RE = re.compile(r'^@import\s*"(.*?)"')
+MARKDOWN_ENCODE = "utf-8"
+
+
+def csv_to_table(csv_path):
+    return """
+```eval_rst
+.. csv-table::
+    :file: {}
+    :header-rows: 1
+
+```
+    """.format(csv_path)
+
+
+def import_raw(data_type, path):
+    return """
+```eval_rst
+.. raw:: {}
+    :file: {}
+```
+    """.format(data_type, path)
+
+
+def import_directive(directive, path):
+    return """
+```eval_rst
+.. {}:: {}
+```
+    """.format(directive, path)
+
+
+def import_code_block(code_type, path):
+    return """
+```eval_rst
+.. literalinclude:: {}
+    :language: {}
+```
+    """.format(path, code_type)
+
+
+# noinspection PyUnresolvedReferences
+def pre_process(lines):
+    new_lines = []
+    for line in lines:
+        if line.startswith("@import"):
+            g = IMPORT_RE.match(line)
+            if g and g.group(1):
+                path = g.group(1)
+                _, ext = os.path.splitext(path)
+                ext = ext.lower()
+
+                if ext in (".png", ".jpg", ".jpeg", ".apng", ".svg", ".bmp", ".gif"):
+                    new_lines.append("![]({})".format(path))
+                    continue
+                elif ext == ".csv":
+                    new_lines.append(csv_to_table(path))
+                    continue
+                elif ext in (".html", ".css"):
+                    new_lines.append(import_raw(ext[1:], path))
+                    continue
+                elif ext in ('.md', '.mmark', '.markdown'):
+                    try:
+                        new_lines.append(codecs.open(path, "r", MARKDOWN_ENCODE).read())
+                        continue
+                    except:
+                        pass
+                elif ext in EXTENSION_DIRECTIVE_DICT:
+                    new_lines.append(import_directive(EXTENSION_DIRECTIVE_DICT[ext], path))
+                    continue
+                else:
+                    language = EXTENSION_LANGUAGE_DICT.get(ext, "text")
+                    # code block
+                    new_lines.append(import_code_block(language, path))
+                    continue
+
+        new_lines.append(line)
+
+    return new_lines
 
 
 # noinspection PyUnresolvedReferences
@@ -74,8 +211,8 @@ class MarkdownParser(Parser):
         "-t", "rst+raw_html-implicit_figures"
     ]
 
-    # noinspection PyUnresolvedReferences
-    def parse(self, input_string, document):
+    @staticmethod
+    def convert(input_string):
         pre_code = []
         _input_string = []
         for line in input_string.splitlines():
@@ -83,6 +220,9 @@ class MarkdownParser(Parser):
                 pre_code.append(line)
             else:
                 _input_string.append(line)
+
+        # pre process
+        _input_string = pre_process(_input_string)
 
         input_string = "\n".join(_input_string)
         input_dir = None
@@ -100,7 +240,7 @@ class MarkdownParser(Parser):
                     f.write(input_string)
 
             cmdline = "pandoc {} -r markdown -w rst {} -o {}".format(
-                " ".join(self.PANDOC_OPT),
+                " ".join(MarkdownParser.PANDOC_OPT),
                 input_dir[1], output_dir[1]
             )
             os.system(cmdline)
@@ -117,6 +257,12 @@ class MarkdownParser(Parser):
                 os.unlink(input_dir[1])
             if output_dir:
                 os.unlink(output_dir[1])
+
+        return output_string
+
+    # noinspection PyUnresolvedReferences
+    def parse(self, input_string, document):
+        output_string = self.convert(input_string)
 
         if output_string:
             Parser.parse(self, output_string, document)

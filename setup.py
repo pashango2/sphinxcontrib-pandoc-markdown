@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
+from sphinxcontrib.pandoc_markdown import __version__
 
 # long_desc = open('README.md').read()
 
@@ -8,7 +9,7 @@ requires = ['Sphinx>=0.6', 'Markdown']
 
 setup(
     name='sphinxcontrib-pandoc-markdown',
-    version='0.1.5',
+    version=__version__,
     url='https://github.com/pashango2/sphinxcontrib-pandoc-markdown/',
     license='BSD',
     author='Toshiyuki Ishii',
