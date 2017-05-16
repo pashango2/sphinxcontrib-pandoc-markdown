@@ -114,3 +114,52 @@ def test_import():
     ans = "this is import markdown"
     assert MarkdownParser.convert(markdown).strip() == ans
 
+
+def test_list():
+    markdown = """
+```eval_rst
+*A
+*B
+
+    *B-1
+    *B-2
+
+*C
+```
+    """.strip()
+
+    ans = """
+*A
+*B
+
+    *B-1
+    *B-2
+
+*C
+    """.strip()
+
+    assert MarkdownParser.convert(markdown).strip() == ans
+
+
+def test_bullet_list():
+    markdown = """
+- A
+  - A-1
+  - A-2
+- B
+  - B-1
+  - B-2
+    """.strip()
+
+    ans = """
+- A
+
+  - A-1
+  - A-2
+- B
+
+  - B-1
+  - B-2
+    """.strip()
+
+    assert MarkdownParser.convert(markdown).strip() == ans

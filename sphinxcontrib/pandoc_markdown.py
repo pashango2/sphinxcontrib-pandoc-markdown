@@ -180,21 +180,20 @@ def post_process(docs):
                 try:
                     doc = g.next() if PY2 else g.__next__()
                     if doc.strip() == "":
-                        doc = g.next() if PY2 else g.__next__()
-                        reg = re.match("^(\s+).*", doc)
-                        if reg:
-                            space = reg.group(1)
-                        else:
-                            continue
+                        space = None
 
                         while True:
-                            if doc.strip() == "":
-                                break
+                            doc = g.next() if PY2 else g.__next__()
+                            reg = re.match("^(\s*).*", doc)
+                            if reg and space is None:
+                                space = reg.group(1)
+                            else:
+                                if reg.group(1) == "" and doc.strip() != "":
+                                    new_docs.append(doc)
+                                    break
 
                             doc = re.sub("^{}".format(space), "", doc)
                             new_docs.append(doc)
-
-                            doc = g.next() if PY2 else g.__next__()
                 except StopIteration:
                     break
                 continue
