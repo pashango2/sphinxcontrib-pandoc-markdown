@@ -6,3 +6,4 @@ sphinxcontrib_pandoc_markdown\.egg-info/
 _build/lib/sphinxcontrib/
 
 dist/
+*.orig

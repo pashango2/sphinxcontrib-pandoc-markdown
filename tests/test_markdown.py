@@ -80,8 +80,7 @@ def test_import():
     assert output_string.strip() == ans
 
     markdown = '@import "test.mermaid"'
-    ans = ".. mermaid:: test.mermaid".strip()
-    print(MarkdownParser.convert(markdown).strip())
+    ans = ".. mermaid:: test.mermaid"
     assert MarkdownParser.convert(markdown).strip() == ans
 
     markdown = '@import "test.plantuml"'
@@ -142,25 +141,27 @@ def test_list():
     assert MarkdownParser.convert(markdown).strip() == ans
 
 
-def test_list_space2():
+def test_bullet_list():
+    # Note: https://github.com/jgm/pandoc/issues/137
     markdown = """
 - A
-  - A-1
-  - A-2
+    - A-1
+    - A-2
 - B
-  - B-1
-  - B-2
+    - B-1
+    - B-2
     """.strip()
 
     ans = """
-- A
+-  A
 
-  - A-1
-  - A-2
-- B
+   -  A-1
+   -  A-2
 
-  - B-1
-  - B-2
+-  B
+
+   -  B-1
+   -  B-2
     """.strip()
 
     # assert MarkdownParser.convert(markdown).strip() == ans
