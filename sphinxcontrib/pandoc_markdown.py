@@ -8,7 +8,7 @@ from six import PY2
 import codecs
 from docutils.parsers.rst import Parser
 
-__version__ = "1.6"
+__version__ = "1.6.1"
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -91,7 +91,6 @@ def csv_to_table(csv_path):
 .. csv-table::
     :file: {}
     :header-rows: 1
-
 ```
     """.format(csv_path)
 
@@ -167,8 +166,14 @@ def post_process(docs):
     new_docs = []
     code_re = re.compile(r".. code::\s+?(.*)")
 
-    g = (x for x in docs.splitlines())
+    def _code_generator(_docs):
+        for x in _docs.splitlines():
+            val = yield x
+            if val is not None:
+                yield None
+                yield val
 
+    g = _code_generator(docs)
     for doc in g:
         group = code_re.match(doc)
         if group:
@@ -189,7 +194,8 @@ def post_process(docs):
                                 space = reg.group(1)
                             else:
                                 if reg.group(1) == "" and doc.strip() != "":
-                                    new_docs.append(doc)
+                                    g.send(doc)
+                                    # new_docs.append(doc)
                                     break
 
                             doc = re.sub("^{}".format(space), "", doc)
