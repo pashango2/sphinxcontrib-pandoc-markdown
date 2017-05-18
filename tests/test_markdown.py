@@ -186,23 +186,3 @@ def test_bullet_list():
     """.strip()
 
     # assert MarkdownParser.convert(markdown).strip() == ans
-
-    markdown = """
-- A
-  - A-2
-  - A-1
-- B
-  - B-1
-    """.strip()
-  - B-2
-
-    ans = """
--  A
-   -  A-2
-   -  A-1
-
--  B
-   -  B-1
-   -  B-2
-
-    """.strip()
