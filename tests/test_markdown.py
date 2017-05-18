@@ -140,9 +140,30 @@ def test_list():
 
     assert MarkdownParser.convert(markdown).strip() == ans
 
+def test_code_and_quote():
+    markdown = """
+```python
+import os
+```
+
+> test
+    """.strip()
+
+    ans = """
+.. code:: python
+
+    import os
+
+    test
+    """.strip()
+
+    assert MarkdownParser.convert(markdown).strip() == ans
+
 
 def test_bullet_list():
-    # Note: https://github.com/jgm/pandoc/issues/137
+    # Note:
+    # https://github.com/jgm/pandoc/issues/137
+    # https://github.com/jgm/pandoc/issues/3511
     markdown = """
 - A
     - A-1
@@ -164,3 +185,25 @@ def test_bullet_list():
    -  B-2
     """.strip()
     assert MarkdownParser.convert(markdown).strip() == ans
+
+    markdown = """
+- A
+  - A-1
+  - A-2
+- B
+  - B-1
+  - B-2
+    """.strip()
+
+    ans = """
+-  A
+
+   -  A-1
+   -  A-2
+
+-  B
+
+   -  B-1
+   -  B-2
+    """.strip()
+    # assert MarkdownParser.convert(markdown).strip() == ans
