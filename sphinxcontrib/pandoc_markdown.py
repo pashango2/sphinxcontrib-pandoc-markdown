@@ -8,7 +8,7 @@ from six import PY2
 import codecs
 from docutils.parsers.rst import Parser
 
-__version__ = "1.6.1"
+__version__ = "1.6.3"
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -25,11 +25,15 @@ REPLACE_CODE_TYPES = {
     "viz": "graphviz",
     "graph": "graph",
     "digraph": "digraph",
+    'plantuml': 'uml',
+    'puml': 'uml',
+    'wavedrom': 'wavedrom',
 }
 
 
 EXTENSION_DIRECTIVE_DICT = {
     '.mermaid': 'mermaid',
+    '.mmd': 'mermaid',
     '.plantuml': 'uml',
     '.puml': 'uml',
     '.wavedrom': 'wavedrom',
@@ -195,7 +199,6 @@ def post_process(docs):
                             else:
                                 if reg.group(1) == "" and doc.strip() != "":
                                     g.send(doc)
-                                    # new_docs.append(doc)
                                     break
 
                             doc = re.sub("^{}".format(space), "", doc)
