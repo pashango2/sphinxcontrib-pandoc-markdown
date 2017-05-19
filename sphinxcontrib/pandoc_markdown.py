@@ -197,7 +197,7 @@ def pre_process(lines):
 # noinspection PyUnresolvedReferences
 def post_process(docs):
     new_docs = []
-    code_re = re.compile(r".. code::\s+?(.*)")
+    code_re = re.compile(r".. code::\s+?@?(.*)")
 
     def _code_generator(_docs):
         for x in _docs.splitlines():
