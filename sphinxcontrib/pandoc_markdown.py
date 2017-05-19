@@ -8,7 +8,7 @@ from six import PY2
 import codecs
 from docutils.parsers.rst import Parser
 
-__version__ = "1.6.3"
+__version__ = "1.6.5"
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -86,7 +86,9 @@ EXTENSION_LANGUAGE_DICT = {
 }
 
 IMPORT_RE = re.compile(r'^@import\s*"(.*?)"')
+INDENT_SPACE_RE = re.compile(r"^( *)(.*)")
 MARKDOWN_ENCODE = "utf-8"
+WAVEDROM_ENCODE = "utf-8"
 
 
 def csv_to_table(csv_path):
@@ -125,7 +127,22 @@ def import_code_block(code_type, path):
     """.format(path, code_type)
 
 
-# noinspection PyUnresolvedReferences
+def convert_spaces_2_to_4(line):
+    """
+    :note: https://github.com/jgm/pandoc/issues/2575
+
+    Simple avoidance up to pandoc 2.0
+    """
+    g = INDENT_SPACE_RE.match(line)
+    if g:
+        space, contents = g.groups()
+        if len(space) > 0:
+            new_space = max(4, len(space) // 2 * 4)
+            return (" " * new_space) + contents
+
+    return line
+
+
 def pre_process(lines):
     new_lines = []
     for line in lines:
@@ -146,8 +163,18 @@ def pre_process(lines):
                     new_lines.append(import_raw(ext[1:], path))
                     continue
                 elif ext in ('.md', '.mmark', '.markdown'):
+                    # noinspection PyBroadException
                     try:
                         new_lines.append(codecs.open(path, "r", MARKDOWN_ENCODE).read())
+                        continue
+                    except:
+                        pass
+                elif ext == ".wavedrom":
+                    # noinspection PyBroadException
+                    try:
+                        new_lines.append("```wavedrom\n")
+                        new_lines.append(codecs.open(path, "r", WAVEDROM_ENCODE).read())
+                        new_lines.append("```\n")
                         continue
                     except:
                         pass
@@ -159,6 +186,8 @@ def pre_process(lines):
                     # code block
                     new_lines.append(import_code_block(language, path))
                     continue
+        else:
+            line = convert_spaces_2_to_4(line)
 
         new_lines.append(line)
 
