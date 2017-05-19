@@ -91,8 +91,8 @@ def test_import():
     ans = ".. uml:: test.puml"
     assert MarkdownParser.convert(markdown).strip() == ans
 
-    markdown = '@import "test.wavedrom"'
-    ans = ".. wavedrom:: test.wavedrom"
+    markdown = '@import "import.wavedrom"'
+    ans = ".. wavedrom::"
     assert MarkdownParser.convert(markdown).strip() == ans
 
     markdown = '@import "test.viz"'
@@ -121,9 +121,8 @@ def test_list():
 *A
 *B
 
-    *B-1
-    *B-2
-
+  *B-1
+  *B-2
 *C
 ```
     """.strip()
@@ -134,11 +133,11 @@ def test_list():
 
     *B-1
     *B-2
-
 *C
     """.strip()
 
     assert MarkdownParser.convert(markdown).strip() == ans
+
 
 def test_code_and_quote():
     markdown = """
@@ -166,11 +165,11 @@ def test_bullet_list():
     # https://github.com/jgm/pandoc/issues/3511
     markdown = """
 - A
-    - A-1
-    - A-2
+  - A-1
+  - A-2
 - B
-    - B-1
-    - B-2
+  - B-1
+  - B-2
     """.strip()
 
     ans = """
@@ -185,4 +184,4 @@ def test_bullet_list():
    -  B-2
     """.strip()
 
-    # assert MarkdownParser.convert(markdown).strip() == ans
+    assert MarkdownParser.convert(markdown).strip() == ans
