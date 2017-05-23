@@ -8,7 +8,7 @@ from six import PY2
 import codecs
 from docutils.parsers.rst import Parser
 
-__version__ = "1.6.5"
+__version__ = "1.6.6"
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -127,22 +127,6 @@ def import_code_block(code_type, path):
     """.format(path, code_type)
 
 
-def convert_spaces_2_to_4(line):
-    """
-    :note: https://github.com/jgm/pandoc/issues/2575
-
-    Simple avoidance up to pandoc 2.0
-    """
-    g = INDENT_SPACE_RE.match(line)
-    if g:
-        space, contents = g.groups()
-        if len(space) > 0:
-            new_space = max(4, len(space) // 2 * 4)
-            return (" " * new_space) + contents
-
-    return line
-
-
 def pre_process(lines):
     new_lines = []
     for line in lines:
@@ -186,8 +170,6 @@ def pre_process(lines):
                     # code block
                     new_lines.append(import_code_block(language, path))
                     continue
-        else:
-            line = convert_spaces_2_to_4(line)
 
         new_lines.append(line)
 
@@ -245,7 +227,8 @@ class MarkdownParser(Parser):
     PANDOC_OPT = [
         "-f", "markdown+raw_html+markdown_in_html_blocks+autolink_bare_uris"
               "+tex_math_single_backslash-implicit_figures",
-        "-t", "rst+raw_html-implicit_figures"
+        "-t", "rst+raw_html-implicit_figures",
+        "--tab-stop", "2"
     ]
 
     @staticmethod
