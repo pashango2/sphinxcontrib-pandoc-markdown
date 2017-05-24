@@ -126,7 +126,24 @@ def import_code_block(code_type, path):
 ```
     """.format(path, code_type)
 
+def readfile(path, encode):
+    source_path = os.path.join("source", path)
 
+    if os.path.isfile(source_path):
+        tgt_path = source_path
+    else:
+        if os.path.isfile(path):
+            tgt_path = path
+        else:
+            return None
+
+    # noinspection PyBroadException
+    try:
+        return codecs.open(tgt_path, "r", encode).read()
+    except:
+        return None
+
+    
 def pre_process(lines):
     new_lines = []
     for line in lines:
@@ -147,21 +164,17 @@ def pre_process(lines):
                     new_lines.append(import_raw(ext[1:], path))
                     continue
                 elif ext in ('.md', '.mmark', '.markdown'):
-                    # noinspection PyBroadException
-                    try:
-                        new_lines.append(codecs.open(path, "r", MARKDOWN_ENCODE).read())
+                    content = readfile(path, MARKDOWN_ENCODE)
+                    if content:
+                        new_lines.append(content)
                         continue
-                    except:
-                        pass
                 elif ext == ".wavedrom":
-                    # noinspection PyBroadException
-                    try:
+                    content = readfile(path, MARKDOWN_ENCODE)
+                    if content:
                         new_lines.append("```wavedrom\n")
-                        new_lines.append(codecs.open(path, "r", WAVEDROM_ENCODE).read())
+                        new_lines.append(content)
                         new_lines.append("```\n")
                         continue
-                    except:
-                        pass
                 elif ext in EXTENSION_DIRECTIVE_DICT:
                     new_lines.append(import_directive(EXTENSION_DIRECTIVE_DICT[ext], path))
                     continue
