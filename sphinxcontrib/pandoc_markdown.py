@@ -6,6 +6,7 @@ import re
 from tempfile import mkstemp
 from six import PY2
 import codecs
+import subprocess
 from docutils.parsers.rst import Parser
 
 __version__ = "1.6.7"
