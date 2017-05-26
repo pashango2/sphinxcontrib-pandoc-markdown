@@ -185,3 +185,18 @@ def test_bullet_list():
     """.strip()
 
     assert MarkdownParser.convert(markdown).strip() == ans
+
+
+def test_softbreak():
+    markdown = "one  \ntwo"
+    assert MarkdownParser.convert(markdown).strip() == '| one\n| two'
+
+    markdown = """
+one
+two
+
+# title
+    """.strip()
+    assert MarkdownParser.convert(markdown).strip() == '| one\n| two'
+
+
