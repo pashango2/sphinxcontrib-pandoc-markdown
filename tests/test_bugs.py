@@ -23,3 +23,13 @@ def test_bug_import():
     assert ans == MarkdownParser.convert(markdown).strip()
 
 
+def test_bug_indent():
+    markdown = """
+* test
+  test
+    """.strip()
+
+    # assert ans == MarkdownParser.convert(markdown).strip()
+
+    print(MarkdownParser.convert(markdown).strip())
+

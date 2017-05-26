@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 
 import os
-import subprocess
 import re
 from tempfile import mkstemp
 from six import PY2
@@ -87,7 +86,6 @@ EXTENSION_LANGUAGE_DICT = {
 }
 
 IMPORT_RE = re.compile(r'^@import\s*"(.*?)"')
-INDENT_SPACE_RE = re.compile(r"^( *)([-*\d].*)")
 MARKDOWN_ENCODE = "utf-8"
 WAVEDROM_ENCODE = "utf-8"
 
@@ -126,23 +124,6 @@ def import_code_block(code_type, path):
     :language: {}
 ```
     """.format(path, code_type)
-
-
-def convert_spaces_2_to_4(line):
-    """
-    :note: https://github.com/jgm/pandoc/issues/2575
-
-    Simple avoidance up to pandoc 2.0
-    """
-    g = INDENT_SPACE_RE.match(line)
-    if g:
-        space, contents = g.groups()
-        if len(space) > 0:
-            new_space = max(4, len(space) // 2 * 4)
-            return (" " * new_space) + contents
-
-    return line
-
 
 def readfile(path, encode):
     source_path = os.path.join("source", path)
@@ -201,8 +182,6 @@ def pre_process(lines):
                     # code block
                     new_lines.append(import_code_block(language, path))
                     continue
-        else:
-            line = convert_spaces_2_to_4(line)
 
         new_lines.append(line)
 
@@ -212,7 +191,7 @@ def pre_process(lines):
 # noinspection PyUnresolvedReferences
 def post_process(docs):
     new_docs = []
-    code_re = re.compile(r".. code::\s+?(.*)")
+    code_re = re.compile(r".. code::\s+?@?(.*)")
 
     def _code_generator(_docs):
         for x in _docs.splitlines():
@@ -264,6 +243,7 @@ class MarkdownParser(Parser):
               "+tex_math_single_backslash-implicit_figures",
         "-t", "rst+raw_html-implicit_figures",
         "--filter={}".format(FILTER_PATH),
+        "--tab-stop", "2",
     ]
 
 
