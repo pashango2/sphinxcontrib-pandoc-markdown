@@ -2,13 +2,14 @@
 from __future__ import absolute_import
 
 import os
+import subprocess
 import re
 from tempfile import mkstemp
 from six import PY2
 import codecs
 from docutils.parsers.rst import Parser
 
-__version__ = "1.6.5"
+__version__ = "1.6.7"
 
 REPLACE_CODE_TYPES = {
     "math": "math",
@@ -86,7 +87,7 @@ EXTENSION_LANGUAGE_DICT = {
 }
 
 IMPORT_RE = re.compile(r'^@import\s*"(.*?)"')
-INDENT_SPACE_RE = re.compile(r"^( *)(.*)")
+INDENT_SPACE_RE = re.compile(r"^( *)([-*\d].*)")
 MARKDOWN_ENCODE = "utf-8"
 WAVEDROM_ENCODE = "utf-8"
 
@@ -143,6 +144,24 @@ def convert_spaces_2_to_4(line):
     return line
 
 
+def readfile(path, encode):
+    source_path = os.path.join("source", path)
+
+    if os.path.isfile(source_path):
+        tgt_path = source_path
+    else:
+        if os.path.isfile(path):
+            tgt_path = path
+        else:
+            return None
+
+    # noinspection PyBroadException
+    try:
+        return codecs.open(tgt_path, "r", encode).read()
+    except:
+        return None
+
+
 def pre_process(lines):
     new_lines = []
     for line in lines:
@@ -163,21 +182,17 @@ def pre_process(lines):
                     new_lines.append(import_raw(ext[1:], path))
                     continue
                 elif ext in ('.md', '.mmark', '.markdown'):
-                    # noinspection PyBroadException
-                    try:
-                        new_lines.append(codecs.open(path, "r", MARKDOWN_ENCODE).read())
+                    content = readfile(path, MARKDOWN_ENCODE)
+                    if content:
+                        new_lines.append(content)
                         continue
-                    except:
-                        pass
                 elif ext == ".wavedrom":
-                    # noinspection PyBroadException
-                    try:
+                    content = readfile(path, MARKDOWN_ENCODE)
+                    if content:
                         new_lines.append("```wavedrom\n")
-                        new_lines.append(codecs.open(path, "r", WAVEDROM_ENCODE).read())
+                        new_lines.append(content)
                         new_lines.append("```\n")
                         continue
-                    except:
-                        pass
                 elif ext in EXTENSION_DIRECTIVE_DICT:
                     new_lines.append(import_directive(EXTENSION_DIRECTIVE_DICT[ext], path))
                     continue
@@ -242,11 +257,38 @@ def post_process(docs):
 
 
 class MarkdownParser(Parser):
+    FILTER_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "remove_caption_filter.py"))
+
     PANDOC_OPT = [
         "-f", "markdown+raw_html+markdown_in_html_blocks+autolink_bare_uris"
               "+tex_math_single_backslash-implicit_figures",
-        "-t", "rst+raw_html-implicit_figures"
+        "-t", "rst+raw_html-implicit_figures",
+        "--filter={}".format(FILTER_PATH),
     ]
+
+
+    @staticmethod
+    def to_json(input_string):
+        output_string = None
+        input_dir = None
+
+        try:
+            input_dir = mkstemp()
+            os.close(input_dir[0])
+
+            with open(input_dir[1], 'wt') as f:
+                if PY2:
+                    f.write(input_string.encode('utf-8'))
+                else:
+                    f.write(input_string)
+
+            cmdline = "pandoc -f markdown -t json {}".format(input_dir[1])
+            output_string = subprocess.check_output(cmdline, shell=True)
+        finally:
+            if input_dir:
+                os.unlink(input_dir[1])
+
+        return output_string
 
     @staticmethod
     def convert(input_string):
@@ -286,14 +328,13 @@ class MarkdownParser(Parser):
                 output_string = open(output_dir[1]).read().decode('utf-8')
             else:
                 output_string = open(output_dir[1]).read()
-
-            output_string = post_process(output_string)
-
         finally:
             if input_dir:
                 os.unlink(input_dir[1])
             if output_dir:
                 os.unlink(output_dir[1])
+
+        output_string = post_process(output_string)
 
         return output_string
 
