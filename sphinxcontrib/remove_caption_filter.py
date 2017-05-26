@@ -10,9 +10,15 @@ def myfilter(key, value, format_, meta):
         json:
             [[u'', [], []], [{u'c': u'alt', u't': u'Str'}], [u'path', u'fig:title']]
         """
-        alt = value[1][0].get("c")
+        try:
+            alt = value[1][0].get("c")
+        except IndexError:
+            alt = None
+
         value[1] = []
-        value[2][1] = "fig:{}".format(alt)
+
+        if alt:
+            value[2][1] = u"fig:{}".format(alt)
         return Image(*value)
 
 
