@@ -5,7 +5,7 @@ from sphinxcontrib.pandoc_markdown import __version__
 
 # long_desc = open('README.md').read()
 
-requires = ['Sphinx>=0.6', 'Markdown']
+requires = ['Sphinx>=0.6', "pandocfilters"]
 
 setup(
     name='sphinxcontrib-pandoc-markdown',

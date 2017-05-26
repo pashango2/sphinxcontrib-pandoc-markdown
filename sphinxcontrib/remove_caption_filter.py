@@ -1,7 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+remove caption filter
+---------------------
+
+This is a filter of pandoc.
+
+Mark down Image:
+
+    [alt](path)
+
+Convert as below:
+
+    [](path alt)
+
+"""
 from pandocfilters import toJSONFilter, Image
 
 
-def myfilter(key, value, format_, meta):
+def remove_caption_filter(key, value, format_, meta):
     if key == 'Image':
         """
         markdown:
@@ -23,4 +39,4 @@ def myfilter(key, value, format_, meta):
 
 
 if __name__ == "__main__":
-    toJSONFilter(myfilter)
+    toJSONFilter(remove_caption_filter)
