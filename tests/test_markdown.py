@@ -200,3 +200,11 @@ two
     assert MarkdownParser.convert(markdown).strip() == '| one\n| two'
 
 
+def test_auto_ref():
+    markdown = "correct link: [node](test/node_api.md)"
+    result = "correct link: :doc:`node <test/node_api>`"
+    assert result == MarkdownParser.convert(markdown).strip()
+
+    markdown = "correct link: [node](http://xxx.com/node_api.md)"
+    result = "correct link: `node <http://xxx.com/node_api.md>`__"
+    assert result == MarkdownParser.convert(markdown).strip()
